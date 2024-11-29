@@ -29,6 +29,12 @@ $modulesToInstall = New-Object System.Collections.Generic.List[object]
             ModuleName    = 'platyPS'
             ModuleVersion = '0.12.0'
         }))
+# https://github.com/alt3/Docusaurus.Powershell
+# Needed for our website documentation
+[void]$modulesToInstall.Add(([PSCustomObject]@{
+            ModuleName    = 'Alt3.Docusaurus.Powershell'
+            ModuleVersion = '1.0.37'
+        }))
 
 
 

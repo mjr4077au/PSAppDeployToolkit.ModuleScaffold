@@ -1,33 +1,21 @@
-# this psm1 is for local testing and development use only
+﻿#-----------------------------------------------------------------------------
+#
+# Local psm1 file for testing the module without having to build it.
+#
+#-----------------------------------------------------------------------------
 
-# dot source the parent import for local development variables
-. $PSScriptRoot\Imports.ps1
+# Dot-source our initial imports.
+. "$PSScriptRoot\ImportsFirst.ps1"
 
-# discover all ps1 file(s) in Public and Private paths
-
-$itemSplat = @{
-    Filter      = '*.ps1'
-    Recurse     = $true
-    ErrorAction = 'Stop'
-}
-try {
-    $public = @(Get-ChildItem -Path "$PSScriptRoot\Public" @itemSplat)
-    $private = @(Get-ChildItem -Path "$PSScriptRoot\Private" @itemSplat)
-}
-catch {
-    Write-Error $_
-    throw 'Unable to get get file information from Public & Private src.'
+# Dot-source our imports.
+if (!$Module.Compiled)
+{
+    & $CommandTable.'New-Variable' -Name ModuleFiles -Option Constant -Value ([System.IO.FileInfo[]]$([System.IO.Directory]::GetFiles("$PSScriptRoot\Private"); [System.IO.Directory]::GetFiles("$PSScriptRoot\Public")))
+    & $CommandTable.'New-Variable' -Name FunctionNames -Option Constant -Value ($ModuleFiles | & { process { return $_.BaseName } })
+    & $CommandTable.'New-Variable' -Name FunctionPaths -Option Constant -Value ($FunctionNames -replace '^', 'Microsoft.PowerShell.Core\Function::')
+    & $CommandTable.'Remove-Item' -LiteralPath $FunctionPaths -Force -ErrorAction Ignore
+    $ModuleFiles.FullName | . { process { . $_ } }
 }
 
-# dot source all .ps1 file(s) found
-foreach ($file in @($public + $private)) {
-    try {
-        . $file.FullName
-    }
-    catch {
-        throw ('Unable to dot source {0}' -f $file.FullName)
-    }
-}
-
-# export all public functions
-Export-ModuleMember -Function $public.Basename
+# Dot-source our final imports.
+. "$PSScriptRoot\ImportsLast.ps1"
