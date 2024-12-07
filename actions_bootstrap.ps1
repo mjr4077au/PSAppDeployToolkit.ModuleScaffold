@@ -35,6 +35,12 @@ $modulesToInstall = New-Object System.Collections.Generic.List[object]
             ModuleName    = 'Alt3.Docusaurus.Powershell'
             ModuleVersion = '1.0.37'
         }))
+# https://github.com/PSAppDeployToolkit/PSAppDeployToolkit
+# The star of the show
+[void]$modulesToInstall.Add(([PSCustomObject]@{
+            ModuleName    = 'PSAppDeployToolkit'
+            ModuleVersion = '4.0.2'
+        }))
 
 
 
